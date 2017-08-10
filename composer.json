@@ -1,0 +1,19 @@
+{
+  "name": "bootphp/cache",
+  "description": "PHP Cache Lib",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Lalit Tanwar",
+      "email": "lalit.tanwar07@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "bootphp\\cache\\": ""
+    }
+  },
+  "require": {
+  }
+}
