@@ -8,9 +8,13 @@
 
 namespace bootphp\cache {
 
+    use bootphp\file;
+    use bootphp\project;
+
     class HardCache implements \Psr\SimpleCache\CacheInterface
     {
-        public static $BUILD_PATH = "./build";
+        public static $BUILD_PATH = "/build";
+        public static $PROJECT_ID = null;
         public static $cache = null;
         public $prefix;
         public $hard;
@@ -21,8 +25,8 @@ namespace bootphp\cache {
 
         public static function configure()
         {
-            self::setBuildPath("./build");
-            echo __FILE__;
+            self::setBuildPath(project::$DOC_ROOT . "/build");
+            self::$PROJECT_ID = md5(project::$SCRIPT_FILE);
         }
 
         public static function setBuildPath($BUILD_PATH)
@@ -33,7 +37,7 @@ namespace bootphp\cache {
         public function __construct($prefix = "GLOBAL", $hard_array = array())
         {
             $this->name = $prefix;
-            $this->hard_file = self::$BUILD_PATH . 'rc_' . PROJECT_ID . "_" . $prefix . '.php';
+            $this->hard_file = self::$BUILD_PATH . '/hardcache_' . self::$PROJECT_ID . "_" . $prefix . '.php';
             if ($this->exists()) {
                 if (!isset (self::$cache_array [$this->name])) {
                     self::$cache_array [$this->name] = include $this->hard_file;
@@ -77,7 +81,7 @@ namespace bootphp\cache {
         public function save($check = false)
         {
             if (!$check || $this->dirty) {
-                file_put_contents(\bootphp\file::path($this->hard_file), '<?php return ' . var_export(self::$cache_array [$this->name], true) . ';');
+                file::export_object(\bootphp\file::path($this->hard_file), self::$cache_array [$this->name]);
             }
         }
 
@@ -117,6 +121,11 @@ namespace bootphp\cache {
         public function deleteMultiple($keys)
         {
             // TODO: Implement deleteMultiple() method.
+        }
+
+        function __destruct()
+        {
+            $this->save();
         }
 
     }
